@@ -3,7 +3,7 @@
 
 ## rebuild & run
 ```bash
-$ killall sqlite-http ; rm -f ./sqlite-http ; go build sqlite-http.go && ./sqlite-http -l :8008 -f ./sqlite.db &
+$ killall sqlite-http ; rm -f ./sqlite-http ; go build -v github.com/ludenus/sqlite-http && ./sqlite-http -l :8008 -f ./sqlite.db &
 ```
 
 ## check
