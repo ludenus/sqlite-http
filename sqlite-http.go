@@ -5,9 +5,9 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"net/http"
 	"os"
 	"path/filepath"
-	"net/http"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -18,18 +18,19 @@ type Options struct {
 }
 
 type AgentDataSrcRecord struct {
-	Id int `json:"id"`
-	QaData string `json:"qa_data"`
-	Testrun int `json:"testrun"`
-	Stamp int `json:"stamp"`
+	Id      int    `json:"id"`
+	QaData  string `json:"qa_data"`
+	Testrun int    `json:"testrun"`
+	Stamp   int    `json:"stamp"`
 }
 
 type AgentNotificationRecord struct {
-	Id int
+	Id           int
 	Notification string
 }
 
 // ====================================== main
+// https://www.sohamkamani.com/blog/2017/10/18/golang-adding-database-to-web-application/
 
 func main() {
 
@@ -38,45 +39,49 @@ func main() {
 
 	db := initDb(opts.SqliteDbFile)
 	defer db.Close()
-	
-	http.HandleFunc("/qa", requestHandler)
-  	http.ListenAndServe(opts.ListeningAddress, nil)
 
+	http.HandleFunc("/qa", requestHandler)
+	err := http.ListenAndServe(opts.ListeningAddress, nil)
+	if err != nil {
+		panic(err)
+	}
 }
 
 // ====================================== http
 
 func requestHandler(w http.ResponseWriter, req *http.Request) {
 
-	// if r.URL.Path != "/" {
-    //     http.Error(w, "404 not found.", http.StatusNotFound)
-    //     return
-    // }
- 
-    switch req.Method {
-    case "GET":     
+	switch req.Method {
+	case "GET":
 		// w.Header().Set("Server", "QA")
-		w.WriteHeader(200)
+		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("OK"))
-    case "POST":
-        decoder := json.NewDecoder(req.Body)
+	case "POST":
+		decoder := json.NewDecoder(req.Body)
 		var data AgentDataSrcRecord
 		err := decoder.Decode(&data)
 		if err != nil {
-			panic(err)
-		}
-		fmt.Println(data)
-		w.WriteHeader(201)
-    default:
-        fmt.Fprintf(w, "ERROR: only GET and POST methods are supported.")
-	}
-	
-	
-  }
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		} else {
 
+			// TODO: https://www.sohamkamani.com/blog/2017/10/18/golang-adding-database-to-web-application/
+
+			response, err := json.Marshal(data)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+			} else {
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusCreated)
+				w.Write(response)
+			}
+		}
+	default:
+		http.Error(w, "Only GET and POST requests are supported", http.StatusMethodNotAllowed)
+	}
+
+}
 
 // ====================================== db
-
 
 func initDb(dbFile string) *sql.DB {
 
