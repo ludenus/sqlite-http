@@ -3,7 +3,8 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
+	"errors"
+	"log"
 	"net/http"
 	"os"
 
@@ -19,7 +20,7 @@ var db *sql.DB
 func main() {
 
 	opts := ParseArgs(os.Args[1:]) // must not include program name to parse successfully
-	fmt.Println(opts)
+	log.Println(opts)
 
 	db = initDb(opts.SqliteDbFile)
 	defer db.Close()
@@ -42,25 +43,63 @@ func requestHandler(w http.ResponseWriter, req *http.Request) {
 		w.Write([]byte("OK"))
 	case "POST":
 		decoder := json.NewDecoder(req.Body)
-		var data AgentDataSrcRecord
-		err := decoder.Decode(&data)
+
+		var dataToInsert AgentDataSrcRecord
+		var selectedData AgentDataSrcRecord
+
+		err := decoder.Decode(&dataToInsert)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			reportError500(w, err)
 		} else {
-
-			// TODO: https://www.sohamkamani.com/blog/2017/10/18/golang-adding-database-to-web-application/
-
-			response, err := json.Marshal(data)
+			res, err := insertTestData(dataToInsert)
 			if err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
+				reportError500(w, err)
 			} else {
-				w.Header().Set("Content-Type", "application/json")
-				w.WriteHeader(http.StatusCreated)
-				w.Write(response)
+				id, err := res.LastInsertId()
+				if err != nil {
+					reportError500(w, err)
+				} else {
+					rows, err := selectTestData(id)
+					if err != nil {
+						reportError500(w, err)
+					} else {
+						defer rows.Close()
+
+						for rows.Next() {
+							err := rows.Scan(&selectedData.Id, &selectedData.QaData, &selectedData.Testrun, &selectedData.Stamp)
+							if err != nil {
+								reportError500(w, err)
+							} else {
+								response, err := json.Marshal(selectedData)
+								if err != nil {
+									reportError500(w, err)
+								} else {
+									w.Header().Set("Content-Type", "application/json")
+									w.WriteHeader(http.StatusCreated)
+									w.Write(response)
+								}
+							}
+						}
+
+						err := rows.Err()
+						if err != nil {
+							reportError500(w, err)
+						}
+					}
+				}
 			}
 		}
 	default:
-		http.Error(w, "Only GET and POST requests are supported", http.StatusMethodNotAllowed)
+		reportError(w, errors.New("Only GET and POST requests are supported"), http.StatusMethodNotAllowed)
 	}
 
+}
+
+func reportError500(w http.ResponseWriter, err error) {
+	reportError(w, err, http.StatusInternalServerError)
+}
+
+func reportError(w http.ResponseWriter, err error, code int) {
+	http.Error(w, err.Error(), code)
+	log.Println(err)
 }

@@ -3,15 +3,15 @@ package main
 import(
 	"path/filepath"
 	"os"
-	"fmt"
+	"log"
 )
 
 func createFileIfNotExists(filename string) string {
 
 	if fileExists(filename) {
-		fmt.Println("file exists: " + filename)
+		log.Println("file exists: " + filename)
 	} else {
-		fmt.Println("creating file: " + filename)
+		log.Println("creating file: " + filename)
 
 		os.MkdirAll(filepath.Dir(filename), 0755)
 		os.Create(filename)
