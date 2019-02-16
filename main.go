@@ -34,7 +34,7 @@ func main() {
 	}
 }
 
-// ====================================== http
+// TODO: refactor error handling https://blog.golang.org/error-handling-and-go
 
 func requestHandler(w http.ResponseWriter, req *http.Request) {
 
@@ -53,28 +53,28 @@ func requestHandler(w http.ResponseWriter, req *http.Request) {
 		err := decoder.Decode(&dataToInsert)
 		if err != nil {
 			log.Println(err)
-			reportError500(w, err)
+			reportError(w, err, http.StatusInternalServerError)
 			return
 		}
 
 		res, err := insertTestData(dataToInsert)
 		if err != nil {
 			log.Println(err)
-			reportError500(w, err)
+			reportError(w, err, http.StatusInternalServerError)
 			return
 		}
 
 		id, err := res.LastInsertId()
 		if err != nil {
 			log.Println(err)
-			reportError500(w, err)
+			reportError(w, err, http.StatusInternalServerError)
 			return
 		}
 
 		rows, err := selectTestData(id)
 		if err != nil {
 			log.Println(err)
-			reportError500(w, err)
+			reportError(w, err, http.StatusInternalServerError)
 			return
 		}
 
@@ -84,14 +84,14 @@ func requestHandler(w http.ResponseWriter, req *http.Request) {
 			err := rows.Scan(&selectedData.Id, &selectedData.QaData, &selectedData.Testrun, &selectedData.Stamp)
 			if err != nil {
 				log.Println(err)
-				reportError500(w, err)
+				reportError(w, err, http.StatusInternalServerError)
 				return
 			}
 
 			response, err := json.Marshal(selectedData)
 			if err != nil {
 				log.Println(err)
-				reportError500(w, err)
+				reportError(w, err, http.StatusInternalServerError)
 				return
 			}
 
@@ -103,7 +103,7 @@ func requestHandler(w http.ResponseWriter, req *http.Request) {
 		err = rows.Err()
 		if err != nil {
 			log.Println(err)
-			reportError500(w, err)
+			reportError(w, err, http.StatusInternalServerError)
 			return
 		}
 
@@ -111,10 +111,6 @@ func requestHandler(w http.ResponseWriter, req *http.Request) {
 		reportError(w, errors.New("Only GET and POST requests are supported"), http.StatusMethodNotAllowed)
 	}
 
-}
-
-func reportError500(w http.ResponseWriter, err error) {
-	reportError(w, err, http.StatusInternalServerError)
 }
 
 func reportError(w http.ResponseWriter, err error, code int) {

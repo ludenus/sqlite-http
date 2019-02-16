@@ -1,9 +1,19 @@
 # sqlite-http
 
 
-## rebuild & run
+## build
 ```bash
-$ killall sqlite-http ; rm -f ./sqlite-http ; go build -v github.com/ludenus/sqlite-http && ./sqlite-http -l :8008 -f ./sqlite.db &
+$ go build -v github.com/ludenus/sqlite-http && ./sqlite-http -l :8008 -f ./sqlite.db &
+```
+
+## build small binary
+```bash
+$ GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -v github.com/ludenus/sqlite-http && upx --ultra-brute ./sqlite-http
+```
+
+## run
+```bash
+$ ./sqlite-http -l :8008 -f ./sqlite.db &
 ```
 
 ## check
