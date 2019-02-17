@@ -1,23 +1,35 @@
 package main
 
-import(
-	"path/filepath"
-	"os"
+import (
 	"log"
+	"os"
+	"path/filepath"
 )
 
 func createFileIfNotExists(filename string) string {
 
 	if fileExists(filename) {
-		log.Println("file exists: " + filename)
+		log.Println("use existing file: " + filename)
 	} else {
-		log.Println("creating file: " + filename)
+		log.Println("creating new file: " + filename)
 
-		os.MkdirAll(filepath.Dir(filename), 0755)
-		os.Create(filename)
+		err := os.MkdirAll(filepath.Dir(filename), 0755)
+		if err != nil {
+			panic(err)
+		}
+
+		_, err = os.Create(filename)
+		if err != nil {
+			panic(err)
+		}
 	}
 
-	return filename
+	fullpath, err := filepath.Abs(filename)
+	if err != nil {
+		panic(err)
+	}
+
+	return fullpath
 }
 
 func fileExists(filename string) bool {

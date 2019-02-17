@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -12,8 +13,11 @@ var (
 )
 
 func initDb(dbFile string) *sql.DB {
+	
+	f := createFileIfNotExists(dbFile)
+	log.Println("opening sqlite db: " +f)
 
-	db := openDbOrDie(createFileIfNotExists(dbFile))
+	db := openDbOrDie(f)
 
 	createTableDataSrc := fmt.Sprintf("CREATE TABLE  IF NOT EXISTS `%s` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `qa_data` VARCHAR(255) NULL, `testrun` INTEGER NULL,`stamp` INTEGER NULL)", agentDataSrcTable)
 	createTableNotifications := fmt.Sprintf("CREATE TABLE  IF NOT EXISTS `%s` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `notification` VARCHAR(255) NULL)", agentNotificationTable)

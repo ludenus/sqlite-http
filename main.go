@@ -15,19 +15,19 @@ import (
 var db *sql.DB
 
 // ====================================== main
-//
-// https://www.sohamkamani.com/blog/2017/10/18/golang-adding-database-to-web-application/
 
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
 	opts := ParseArgs(os.Args[1:]) // must not include program name to parse successfully
-	log.Println(opts)
 
 	db = initDb(opts.SqliteDbFile)
 	defer db.Close()
 
 	http.HandleFunc("/qa", requestHandler)
+
+	log.Println("listeining on: " + opts.ListeningAddress)
+
 	err := http.ListenAndServe(opts.ListeningAddress, nil)
 	if err != nil {
 		panic(err)

@@ -1,5 +1,5 @@
 # sqlite-http
-
+provides web interface for inserting qa data into sqlite db
 
 ## build
 ```bash
@@ -16,9 +16,12 @@ $ GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -v github.com/ludenus/sqlite
 $ ./sqlite-http -l :8008 -f ./sqlite.db &
 ```
 
-## check
+## check status
 ```bash
 $ curl -i -X GET http://localhost:8008/qa
+```
 
+## insert qa data into sqlite db
+```bash
 $ curl -i -X POST http://localhost:8008/qa -d "{ \"id\":-0, \"qa_data\":\"`whoami`@`hostname`\", \"testrun\":-1, \"stamp\":`date +%s` }"
 ```

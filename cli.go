@@ -1,8 +1,8 @@
 package main
 
 import (
-	"os"
 	"flag"
+	"os"
 )
 
 func ParseArgs(arguments []string) Options {
@@ -11,13 +11,10 @@ func ParseArgs(arguments []string) Options {
 		SqliteDbFile:     fromEnvVar("SQLITE_HTTP_DB_FILE", "sqlite.db"),
 	}
 
-	fs := flag.NewFlagSet("main", flag.ExitOnError)
+	fs := flag.NewFlagSet("sqlite-http", flag.ExitOnError)
 
-	fs.StringVar(&options.ListeningAddress, "listening-address", options.ListeningAddress, "listen on ip:port")
-	fs.StringVar(&options.ListeningAddress, "l", options.ListeningAddress, "listen on ip:port")
-
-	fs.StringVar(&options.SqliteDbFile, "sqlite-db-file", options.SqliteDbFile, "clients description")
-	fs.StringVar(&options.SqliteDbFile, "f", options.SqliteDbFile, "clients description")
+	fs.StringVar(&options.ListeningAddress, "l", options.ListeningAddress, "listening address ip:port")
+	fs.StringVar(&options.SqliteDbFile, "f", options.SqliteDbFile, "sqlite db file name")
 
 	fs.Parse(arguments)
 	return options
