@@ -13,6 +13,11 @@ type AgentDataSrcRecord struct {
 }
 
 type AgentNotificationRecord struct {
-	Id           int
-	Notification string
+	Id           int `json:"id"`
+	Notification string `json:"notification"`
+}
+
+type Info struct {
+	GitBranch string `json:"gitBranch"`
+	GitCommit string `json:"gitCommit"`
 }

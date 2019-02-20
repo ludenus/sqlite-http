@@ -3,8 +3,8 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	"log"
 	_ "github.com/mattn/go-sqlite3"
+	"log"
 )
 
 var (
@@ -13,9 +13,9 @@ var (
 )
 
 func initDb(dbFile string) *sql.DB {
-	
+
 	f := createFileIfNotExists(dbFile)
-	log.Println("opening sqlite db: " +f)
+	log.Println("opening sqlite db: " + f)
 
 	db := openDbOrDie(f)
 
@@ -29,13 +29,33 @@ func initDb(dbFile string) *sql.DB {
 }
 
 func insertTestData(data AgentDataSrcRecord) (sql.Result, error) {
-	insertSql := fmt.Sprintf("INSERT INTO `%s` (`qa_data`, `testrun`, `stamp`) VALUES ($1,$2,$3)", agentDataSrcTable)
-	return db.Exec(insertSql, data.QaData, data.Testrun, data.Stamp)
+	insertSQL := fmt.Sprintf("INSERT INTO `%s` (`qa_data`, `testrun`, `stamp`) VALUES ($1,$2,$3)", agentDataSrcTable)
+	return db.Exec(insertSQL, data.QaData, data.Testrun, data.Stamp)
 }
 
-func selectTestData(id int64) (*sql.Rows, error) {
-	selectSql := fmt.Sprintf("SELECT * FROM `%s` WHERE id=%d", agentDataSrcTable, id)
-	return db.Query(selectSql)
+func selectTestDataById(id int64) (*sql.Rows, error) {
+	insertSQL := fmt.Sprintf("SELECT * FROM `%s` WHERE id=%d", agentDataSrcTable, id)
+	return db.Query(insertSQL)
+}
+
+func selectTestDataAll() (*sql.Rows, error) {
+	insertSQL := fmt.Sprintf("SELECT * FROM `%s`", agentDataSrcTable)
+	return db.Query(insertSQL)
+}
+
+func selectNotificationById(id int64) (*sql.Rows, error) {
+	insertSQL := fmt.Sprintf("SELECT * FROM `%s` WHERE id=%d", agentNotificationTable, id)
+	return db.Query(insertSQL)
+}
+
+func selectNotificationsLike(str string) (*sql.Rows, error) {
+	insertSQL := fmt.Sprintf("SELECT * FROM `%s` WHERE notification LIKE $1", agentNotificationTable)
+	return db.Query(insertSQL, str)
+}
+
+func selectNotificationsAll() (*sql.Rows, error) {
+	insertSQL := fmt.Sprintf("SELECT * FROM `%s`", agentNotificationTable)
+	return db.Query(insertSQL)
 }
 
 func openDbOrDie(dbFile string) *sql.DB {
