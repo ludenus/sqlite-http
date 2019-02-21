@@ -4,6 +4,8 @@
 set -e
 set -x
 
+go get github.com/mattn/go-sqlite3
+
 gitBranch=`git rev-parse --abbrev-ref HEAD`
 gitCommit=`git rev-parse HEAD | cut -c-8`
 
