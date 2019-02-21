@@ -20,4 +20,5 @@ type AgentNotificationRecord struct {
 type Info struct {
 	GitBranch string `json:"gitBranch"`
 	GitCommit string `json:"gitCommit"`
+	GitDescribe string `json:"gitDescribe"`
 }

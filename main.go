@@ -13,10 +13,12 @@ var db *sql.DB
 
 var GitBranch string
 var GitCommit string
+var GitDescribe string
 
 var GitInfo = Info{
 	GitBranch: GitBranch,
 	GitCommit: GitCommit,
+	GitDescribe: GitDescribe,
 }
 
 // ====================================== main
