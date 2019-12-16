@@ -19,7 +19,7 @@ func initDb(dbFile string) *sql.DB {
 
 	db := openDbOrDie(f)
 
-	createTableDataSrc := fmt.Sprintf("CREATE TABLE  IF NOT EXISTS `%s` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `qa_data` VARCHAR(255) NULL, `testrun` INTEGER NULL,`stamp` INTEGER NULL)", agentDataSrcTable)
+	createTableDataSrc := fmt.Sprintf("CREATE TABLE  IF NOT EXISTS `%s` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `qa_data` VARCHAR(255) NULL, `testrun` INTEGER NULL,`stamp` INTEGER NULL, `blob_data` VARCHAR(255) NULL)", agentDataSrcTable)
 	createTableNotifications := fmt.Sprintf("CREATE TABLE  IF NOT EXISTS `%s` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `notification` VARCHAR(255) NULL)", agentNotificationTable)
 
 	execSqlOrDie(db, createTableDataSrc)
@@ -29,33 +29,33 @@ func initDb(dbFile string) *sql.DB {
 }
 
 func insertTestData(data AgentDataSrcRecord) (sql.Result, error) {
-	insertSQL := fmt.Sprintf("INSERT INTO `%s` (`qa_data`, `testrun`, `stamp`) VALUES ($1,$2,$3)", agentDataSrcTable)
-	return db.Exec(insertSQL, data.QaData, data.Testrun, data.Stamp)
+	sql := fmt.Sprintf("INSERT INTO `%s` (`qa_data`, `testrun`, `stamp`, `blob_data`) VALUES ($1,$2,$3,$4)", agentDataSrcTable)
+	return db.Exec(sql, data.QaData, data.Testrun, data.Stamp, data.BlobData)
 }
 
 func selectTestDataById(id int64) (*sql.Rows, error) {
-	insertSQL := fmt.Sprintf("SELECT * FROM `%s` WHERE id=%d", agentDataSrcTable, id)
-	return db.Query(insertSQL)
+	sql := fmt.Sprintf("SELECT * FROM `%s` WHERE id=%d", agentDataSrcTable, id)
+	return db.Query(sql)
 }
 
 func selectTestDataAll() (*sql.Rows, error) {
-	insertSQL := fmt.Sprintf("SELECT * FROM `%s`", agentDataSrcTable)
-	return db.Query(insertSQL)
+	sql := fmt.Sprintf("SELECT * FROM `%s`", agentDataSrcTable)
+	return db.Query(sql)
 }
 
 func selectNotificationById(id int64) (*sql.Rows, error) {
-	insertSQL := fmt.Sprintf("SELECT * FROM `%s` WHERE id=%d", agentNotificationTable, id)
-	return db.Query(insertSQL)
+	sql := fmt.Sprintf("SELECT * FROM `%s` WHERE id=%d", agentNotificationTable, id)
+	return db.Query(sql)
 }
 
 func selectNotificationsLike(str string) (*sql.Rows, error) {
-	insertSQL := fmt.Sprintf("SELECT * FROM `%s` WHERE notification LIKE $1", agentNotificationTable)
-	return db.Query(insertSQL, str)
+	sql := fmt.Sprintf("SELECT * FROM `%s` WHERE notification LIKE $1", agentNotificationTable)
+	return db.Query(sql, str)
 }
 
 func selectNotificationsAll() (*sql.Rows, error) {
-	insertSQL := fmt.Sprintf("SELECT * FROM `%s`", agentNotificationTable)
-	return db.Query(insertSQL)
+	sql := fmt.Sprintf("SELECT * FROM `%s`", agentNotificationTable)
+	return db.Query(sql)
 }
 
 func openDbOrDie(dbFile string) *sql.DB {

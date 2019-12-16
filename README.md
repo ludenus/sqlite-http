@@ -25,9 +25,16 @@ $ curl -X GET http://localhost:8008/info
 
 ## insert qa data into sqlite db
 ```bash
-$ curl -X POST http://localhost:8008/data -d "{ \"id\":-0, \"qa_data\":\"`whoami`@`hostname`\", \"testrun\":-1, \"stamp\":`date +%s` }"
+$ curl -v -X POST http://localhost:8008/data -d "{ \"id\":-0, \"qa_data\":\"`whoami`@`hostname`\", \"testrun\":-1, \"stamp\":`date +%s`, \"blob_data\":\"`whoami`@`hostname`\" }"
 
-{"id":3,"qa_data":"asusrog@asusrog-G752VS","testrun":-1,"stamp":1550700230}
+{"id":5,"qa_data":"andrey@qa-pc","testrun":-1,"stamp":1576503117,"blob_data":"andrey@qa-pc"}
+```
+
+## select qa data from sqlite db
+```bash
+$ curl -X GET http://localhost:8008/data
+
+[{"id":1,"qa_data":"andrey@qa-pc","testrun":-1,"stamp":1576502460,"blob_data":""}]
 ```
 
 ## select notifications from sqlite db

@@ -104,7 +104,7 @@ func dataRequestHandler(w http.ResponseWriter, req *http.Request) {
 		for rows.Next() {
 			var record AgentDataSrcRecord
 
-			err := rows.Scan(&record.Id, &record.QaData, &record.Testrun, &record.Stamp)
+			err := rows.Scan(&record.Id, &record.QaData, &record.Testrun, &record.Stamp, &record.BlobData)
 			if err != nil {
 				log.Println(httpError(w, err, http.StatusInternalServerError))
 				return
@@ -162,7 +162,7 @@ func dataRequestHandler(w http.ResponseWriter, req *http.Request) {
 		defer rows.Close()
 
 		for rows.Next() {
-			err := rows.Scan(&selectedData.Id, &selectedData.QaData, &selectedData.Testrun, &selectedData.Stamp)
+			err := rows.Scan(&selectedData.Id, &selectedData.QaData, &selectedData.Testrun, &selectedData.Stamp, &selectedData.BlobData)
 			if err != nil {
 				log.Println(httpError(w, err, http.StatusInternalServerError))
 				return
